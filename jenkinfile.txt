@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Deploy from Local Registry') {
+            steps {
+                sh '''
+                docker rm -f my-rest-api || true
+
+                docker run -d \
+                --name my-rest-api \
+                --env-file common/config/app.env \
+                -p 9002:8080 \
+                localhost:5000/my-rest-api:latest
+                '''
+            }
+        }
+
+        stage('Verify Container') {
+            steps {
+                sh '''
+                docker ps | grep my-rest-api
+                '''
+            }
+        }
+    }
+}
